@@ -1,33 +1,21 @@
 import numpy as np
 from keras.preprocessing.image import ImageDataGenerator
 
-class VoteEnsembleClassifier():
+class CNNVoteEnsembleClassifier():
 
-  def __init__(self, model_list):
+# When defining this model, we will get two parameters : list of model and ImageDataGenerator. (because it is CNN)
+  def __init__(self, model_list, datagen = 'None'):
     self.model_list = model_list
-
-  # 여기서는 test_data, test_labes에 대해 prediction matrix를 추출한다는 의미
-  def fit(self, test_data, test_labels, datagen = 'None'):
     if datagen == 'None':
-        datagen = ImageDataGenerator(
+        self.datagen = ImageDataGenerator(
             rescale = 1/255
         )
-    result_list = []
+    else:
+      self.datagen = datagen
 
-    for model in self.model_list:
-      test_generator = datagen.flow(test_data, test_labels, batch_size = 32, shuffle = False)
-      result = model.predict(test_generator)
-      result_list.append(result)
-
-    result_array = np.array(result_list)
-
-    prediction = []
-
-    for i in range(result_array.shape[1]):
-      predictions_for_sample = result_array[:, i, :]
-      prediction.append(np.mean(predictions_for_sample, axis = 0))
-
-    self.prediction = prediction
+  # from this fit function, you can fit the models. You have to take this function.
+  def fit(self, test_data, test_labels, fit_base_estimators = False):
+    pass # soon update
 
   def categorical_crossentropy(self, y_true, y_pred):
     epsilon = 1e-15  # 아주 작은 값, 로그의 분모가 0이 되는 것을 방지하기 위해 추가됨
@@ -61,7 +49,7 @@ class VoteEnsembleClassifier():
 
     for model in self.model_list:
       index = np.zeros(len(test_data))
-      test_generator = datagen.flow(test_data, index, batch_size = 32, shuffle = False)
+      test_generator = self.datagen.flow(test_data, index, batch_size = 32, shuffle = False)
       result = model.predict(test_generator)
       result_list.append(result)
 
@@ -75,3 +63,24 @@ class VoteEnsembleClassifier():
 
     self.prediction = prediction
     print(prediction)
+    
+  # this function will be soon disappeared
+  def show_accuracy_score(self, test_data, test_labels):
+    result_list = []
+
+    for model in self.model_list:
+      test_generator = self.datagen.flow(test_data, test_labels, batch_size = 32, shuffle = False)
+      result = model.predict(test_generator)
+      result_list.append(result)
+
+    result_array = np.array(result_list)
+
+    prediction = []
+
+    for i in range(result_array.shape[1]):
+      predictions_for_sample = result_array[:, i, :]
+      prediction.append(np.mean(predictions_for_sample, axis = 0))
+
+    self.prediction = prediction
+    
+    self.show_accuracy(test_labels)
