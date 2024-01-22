@@ -12,9 +12,11 @@ class CNNVoteEnsembleClassifier():
         )
     else:
       self.datagen = datagen
+    self.__fit__ = False
 
   # from this fit function, you can fit the models. You have to take this function.
-  def fit(self, test_data, test_labels, fit_base_estimators = False):
+  def fit(self, test_data, test_labels, fit_base_estimators = False, *args, **kwarg):
+    self.__fit__ = True
     pass # soon update
 
   def categorical_crossentropy(self, y_true, y_pred):
@@ -45,6 +47,8 @@ class CNNVoteEnsembleClassifier():
 
   # test_data(4차원)이 들어오면 이를 예측.
   def predict(self, test_data):
+    if self._fit__ == False:
+      raise Exception
     result_list = []
 
     for model in self.model_list:
