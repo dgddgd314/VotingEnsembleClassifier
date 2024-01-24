@@ -5,26 +5,43 @@ class CNNVoteEnsembleClassifier():
 
 # When defining this model, we will get two parameters : list of model and ImageDataGenerator. (because it is CNN)
   def __init__(self, model_list, datagen = 'None'):
+    
+    # model_list include every set of model.
     self.model_list = model_list
+    
+    # because datagen generates random image, we have to get datagenerator from the start.
     if datagen == 'None':
         self.datagen = ImageDataGenerator(
             rescale = 1/255
         )
     else:
       self.datagen = datagen
+      
+    # if this model is not fitted, raise Error.
     self.__fit__ = False
 
-  # from this fit function, you can fit the models. You have to take this function.
-  def fit(self, test_data, test_labels, fit_base_estimators = False, *args, **kwarg):
+  # from this fit function, you can fit the models.
+  def fit(self, test_data, test_labels, fit_base_estimators = False, *args, **kwargs):
+    
+    # because this is fitted.
     self.__fit__ = True
-    pass # soon update
-
+    
+    # if fit_base_estimators is True, fit. if not; just remain it.
+    if fit_base_estimators == True:
+      pass # soon update : this part will be used at learning each models. for **kwargs, those will support other parameters for AI : like batches...
+    
+    
+    # if it is false, remain it as it is.
+    else :
+      pass
+  
+  ## about accuracy, this will be disappeared. this is over-functioned.
+  # calculating cross entropy
   def categorical_crossentropy(self, y_true, y_pred):
-    epsilon = 1e-15  # 아주 작은 값, 로그의 분모가 0이 되는 것을 방지하기 위해 추가됨
-    y_pred = np.clip(y_pred, epsilon, 1 - epsilon)  # 예측값을 0에서 1 사이로 클리핑
-    N = y_pred.shape[0]  # 배치 크기
+    epsilon = 1e-15 
+    y_pred = np.clip(y_pred, epsilon, 1 - epsilon)  
+    N = y_pred.shape[0]  
 
-    # 교차 엔트로피 계산
     cross_entropy = -np.sum(y_true * np.log(y_pred + epsilon)) / N
 
     return cross_entropy
@@ -44,6 +61,8 @@ class CNNVoteEnsembleClassifier():
   # loss와 정확도 표시
   def show_accuracy(self, imglabel):
     print(f'loss : {self.categorical_crossentropy(imglabel, self.prediction)}, accuracy : {self.accuracy(imglabel, self.prediction)}')
+    
+  ## until here.
 
   # test_data(4차원)이 들어오면 이를 예측.
   def predict(self, test_data):
@@ -68,7 +87,7 @@ class CNNVoteEnsembleClassifier():
     self.prediction = prediction
     print(prediction)
     
-  # this function will be soon disappeared
+  # this function will be also disappeared soon.
   def show_accuracy_score(self, test_data, test_labels):
     result_list = []
 
